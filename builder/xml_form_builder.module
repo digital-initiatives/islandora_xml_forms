@@ -429,11 +429,13 @@ function xml_form_builder_get_associate_form_path($form_name) {
  *   The Form to render.
  * @param string $xml
  *   The metadata to prepopulate the form with,
+ * @param array $parents
+ *   An array containing the offset of the parents.
  *
  * @return array
  *   The Drupal Form, if it exists FALSE otherwise.
  */
-function xml_form_builder_get_form(array $form, array &$form_state, $form_name, $xml = NULL) {
+function xml_form_builder_get_form(array $form, array &$form_state, $form_name, $xml = NULL, $parents = array()) {
   form_load_include($form_state, 'inc', 'xml_form_builder', 'XMLFormRepository');
   form_load_include($form_state, 'inc', 'xml_form_api', 'XMLForm');
   form_load_include($form_state, 'inc', 'xml_form_api', 'XMLFormDefinition');
@@ -446,7 +448,7 @@ function xml_form_builder_get_form(array $form, array &$form_state, $form_name, 
     return FALSE;
   }
   try {
-    $xml_form = new XMLForm($form_state);
+    $xml_form = new XMLForm($form_state, $parents, $form_name);
     // Was not initialized from storage.
     if (!$xml_form->isInitialized()) {
       $definition = new XMLFormDefinition(XMLFormRepository::Get($form_name));
@@ -530,7 +532,7 @@ function xml_form_builder_islandora_edit_datastream_registry(AbstractObject $obj
   $associations = xml_form_builder_get_associations(array(), $object->models, array($datastream->id));
   if (count($associations) > 0) {
     return array(
-      array(
+      'xml_form_builder_edit_form_registry' => array(
         'name' => t('Islandora Content Model Forms'),
         'url' => "islandora/edit_form/{$object->id}/{$datastream->id}",
       ),
@@ -558,7 +560,7 @@ function xml_form_builder_update_object(AbstractObject $object, array $associati
   if ($label) {
     $object->label = $label;
   }
-  $object->models = array($association['content_model']);
+  $object->models = array_merge($object->models, array($association['content_model']));
   $document = $document->document;
   $run_transforms = !variable_get('xml_form_builder_use_default_dc_xslts', FALSE);
   if (isset($association['self_transform']) && $association['self_transform'] != 'No Transform' && $run_transforms) {
@@ -629,15 +631,15 @@ function xml_form_builder_update_metadata_datastream(AbstractObject $object, $da
     if ($datastream->label != "$datastream_id Record") {
       $datastream->label = "$datastream_id Record";
     }
-    if ($datastream->mimetype != 'text/xml') {
-      $datastream->mimetype = 'text/xml';
+    if ($datastream->mimetype != 'application/xml') {
+      $datastream->mimetype = 'application/xml';
     }
   }
   else {
     $datastream = $object->constructDatastream($datastream_id, 'M');
     $datastream->setContentFromString(trim($document->saveXML()));
     $datastream->label = "$datastream_id Record";
-    $datastream->mimetype = 'text/xml';
+    $datastream->mimetype = 'application/xml';
     $object->ingestDatastream($datastream);
     $created = TRUE;
   }
