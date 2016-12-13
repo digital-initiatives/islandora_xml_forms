@@ -58,7 +58,7 @@ class TabPanel {
     // Defaults to TRUE.
     $add = isset($element['#user_data']['add']) ? $element['#user_data']['add'] : TRUE;
     if ($add) {
-      $add_label = isset($element['#user_data']['add_label']) ? $element['#user_data']['add_label'] : t('Add');
+      $add_label = isset($element['#user_data']['add_label']) ? $element['#user_data']['add_label'] : t('Add Another');
       $element[self::ADD_BUTTON] = self::createAddButton($element, $complete_form, $add_label);
     }
     // Defaults to TRUE.
