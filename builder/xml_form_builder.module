@@ -598,10 +598,16 @@ function xml_form_builder_transform_metadata_datastream(DOMDocument $source_docu
   }
 
   if ($transform_path) {
+    // adding for date-in param
+    date_default_timezone_set('America/New_York');
+    $d = date(DATE_ATOM);
+
     $xsl = new DOMDocument();
     $xsl->load($transform_path);
     $xslt = new XSLTProcessor();
     $xslt->importStyleSheet($xsl);
+    // adding for date-in param
+    $xslt->setParameter('', 'date-in', $d);
     $document = $xslt->transformToDoc($source_document);
     return $document;
   }

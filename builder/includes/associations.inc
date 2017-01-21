@@ -212,8 +212,13 @@ function xml_form_builder_transform_document($transform, $source_document) {
       $xsl = new DOMDocument();
       $xsl->load($transform);
     }
+    // adding for date-in param
+    $d = date(DATE_ATOM);
+
     $xslt = new XSLTProcessor();
     $xslt->importStyleSheet($xsl);
+    // adding for date-in param
+    $xslt->setParameter('', 'date-in', $d);
     $document = $xslt->transformToDoc($source_document);
     if ($document && isset($document->documentElement)) {
       return $document;
