@@ -213,6 +213,7 @@ function xml_form_builder_transform_document($transform, $source_document) {
       $xsl->load($transform);
     }
     // adding for date-in param
+    date_default_timezone_set('America/New_York');
     $d = date(DATE_ATOM);
 
     $xslt = new XSLTProcessor();
